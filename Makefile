@@ -16,7 +16,7 @@ helper.o: helper.cpp helper.h
 	g++ $(FLAGS) -c $<
 
 main: main.o book.o member.o library.o helper.o
-	g++ $(FLAGS) -c $@
+	g++ $(FLAGS) $^ -o main
 
 clean:
 	rm -f main *.o library.tgz
