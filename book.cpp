@@ -61,6 +61,16 @@ int Book::getAvailableNumber() const {
 // 加书
 bool addBook(const std::string& id, const std::string& title,
              const std::string& author, const int total_number) {
+    //新增了判断是否输入为空
+    if (id.empty() || title.empty() || author.empty()) {
+        std::cout << "Book information cannot be empty." << std::endl;
+        return false;
+    }
+    //新增了判断非法输入totalnumber<0
+    if (total_number <= 0) {
+        std::cout << "Total number must be positive." << std::endl;
+        return false;
+    }
     if (searchBook_ID(id) != nullptr) {
         std::cout << "The book already exists." << std::endl;
         return false;
@@ -96,6 +106,11 @@ std::vector<Book*> searchBook_title(const std::string& title) {
 // 从文件里加载书库存
 bool addBookFromFile(const std::string& id, const std::string& title,
                      const std::string& author, const int total_number, int available_number) {
+    //新增了判断空输入
+    if (id.empty() || title.empty() || author.empty() ||
+        total_number <= 0 || available_number < 0 || available_number > total_number) {
+        return false;
+    }
     if (searchBook_ID(id) == nullptr) {
         Booklist.push_back(std::unique_ptr<Book>(new Book(id, title, author, total_number, available_number)));
         return true;
@@ -107,15 +122,22 @@ bool addBookFromFile(const std::string& id, const std::string& title,
 // 交互：加书
 void handleAddBook() {
     std::string id, title, author;
-    int total_number;
+    int total_number = 0;
     cout << "Book ID: ";
     cin >> id;
+    cin.ignore(10000, '\n'); // 解决回车残留
     cout << "Title: ";
-    cin >> title;
+    getline(cin, title); // 防止书名有空格读取错误
     cout << "Author: ";
-    cin >> author;
+    getline(cin, author);
     cout << "Total number: ";
-    cin >> total_number;
+    if (!(cin >> total_number)) {
+        cout << "Invalid input, please try again T_T" << endl;
+        cin.clear();
+        cin.ignore(10000, '\n');
+        return;
+    } // 处理错误输入避免死循环
+    cin.ignore(10000, '\n');
     addBook(id, title, author, total_number);
 }
 // 交互：查书
@@ -125,8 +147,12 @@ void handleSearchBook() {
     std::cout << "1. Use ID" << std::endl;
     std::cout << "2. Use title" << std::endl;
     std::cout << "Please enter 1 or 2......" << std::endl;
-    std::cin >> choice;
-
+    if (!(std::cin >> choice)) {
+        std::cout << "Invalid input, please try again T_T" << std::endl;
+        std::cin.clear();
+        std::cin.ignore(10000, '\n');
+        return;
+    } // 避免错误输入
     if (choice == 1) {
         std::string id;
         std::cout << "Please enter the ID: ";
@@ -165,5 +191,8 @@ void handleSearchBook() {
         else {
             std::cout << "Book not found." << std::endl;
         }
+    }
+    else {
+        std::cout << "Invalid choice, please enter 1 or 2." << std::endl;
     }
 }
