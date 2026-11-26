@@ -28,7 +28,7 @@ private:
 };
 
 
-extern std::vector<std::unique_ptr<Book>> allBooks;
+extern std::vector<std::unique_ptr<Book>> Booklist;
 
 bool addBook(const std::string& id, const std::string& title,
              const std::string& author, const int total_number);
