@@ -4,7 +4,7 @@
 | ---------- | ---------------------------------------------------------------------- |
 | Project    | Library Management System                                              |
 | Repository | https://github.com/andyyizixuan/COMP2113-library_management_system.git |
-| Team       | Liu Xuanyu3036590958;                                                  |
+| Team       | Liu Xuanyu 3036590958;                                                  |
 
 Each member documents their own module in four parts: (1) the models and tools used, (2) the prompt
 history, (3) the integration log, (4) critical reflection. Raw chat exports are in `ai_logs/`; the page
@@ -16,12 +16,10 @@ numbers below refer to those PDFs.
 
 ### A.1 Models and tools
 
-- DeepSeek web chat (chat.deepseek.com), model <!-- TODO: version shown in the chat -->, used
-
-  DeepSeek-V4.1-Flash
+- DeepSeek web chat (chat.deepseek.com), model: the default model served by the web app in 2026-11. 
 
 - Used for: interface design, `Book` class, `book.cpp` implementation, compiler and linker errors.
-
+- Also used for documentation: `README.md` and `LEARNING_MATERIALS.md` were drafted with this tool; every technical claim in them was checked.
 - No other AI tools used.
 
 ### A.2 Prompt history
@@ -61,31 +59,19 @@ https://chat.deepseek.com/share/eqpd0h9xvhh7f0sxan
   `g++ -pedantic-errors -std=c++11 -Wall -Wextra`.
 - Global container renamed `allBooks` → `Booklist` (p.115) after aligning names with B–E.
 - During integration, fixed the full-width punctuation in `main.cpp` (E's file) and reported it to E;
-  link errors were traced to files missing from the build. <!-- TODO: 写下最后实际怎么修的 -->
+  link errors were traced to files missing from the build.
 - Transcript: `ai_logs/A_book_module.pdf`, 198 pages.
 
 ### A.4 Critical reflection
 
-**The assistant put `addBook` in the wrong place.** It first made `addBook` a member of `Book`,
-which reads naturally (`b1.addBook(...)`) but cannot work: adding a book means scanning the whole
-collection for a duplicate ID, and one object cannot see its siblings. I caught this while reasoning
-about the data flow (p.88), not from a compiler error — the code would have compiled and silently
-accepted duplicates. The fix was free functions for anything that touches the whole collection, and
-member functions only for operations on a single book. Lesson: data ownership and operation ownership
-are different questions.
+**Where should "addBook" be placed:** At first, I made a mistake in writing it. Even after the AI pointed it out, I didn't immediately correct it. Initially, I placed the "addBook" function as a member function of the class. However, from p.37 to 40, AI pointed out that for the ID lookup in member functions, it is necessary to traverse the entire Booklist. At that time, I did not accept the proposal and did not make a decision until p.88 to make addBook a free function. In book.cpp:74, searchBook_ID is called - only functions that can see the entire Booklist can do this. Lesson: Do not blindly accept the AI's judgment; one must independently judge whether it is reasonable before starting to make modifications.
 
-**The useful AI output was the review, not the code.** At p.97 it reviewed a screenshot of my header
-and named three real defects, including `using namespace std;` in a header and a missing
-`findBookById`. I checked each claim rather than pasting the replacement: two translation units
-including the header, then a clean compile. <!-- TODO: 补你实际的验证动作和证据 -->
+*__File review on page 97: What is valuable is the review, not the ghostwriting.__ It examines my book.h screenshot and points out three issues: "using namespace std;" is written in the header file, borrowBook(const string title) receives an additional book title parameter, and a search function and getter that can return a Book* are missing. I have verified and corrected each of these three issues: Now there is no "using namespace std;" in book.h, borrowCopy() does not have parameters, the search function is ultimately called searchBook_ID (in book.h:35), and the getter is in book.h:16–20. The verification method is that both the main.cpp and tests/test_member.cpp translation units include this header file and can be compiled successfully. Lesson: In the scenario of multiple cpp files, using "using namespace std" will pollute all namespaces, leading to unpredictable compilation errors.
 
-**Two errors that look alike but are not.** The `operator""` error looked like a template problem and
-was a Chinese semicolon; the `undefined reference` looked like a code problem and was a build problem.
-Both cost time because I trusted the error text before checking the actual cause. I now check encoding
-and the build file before editing code. <!-- TODO: 补你实际的修复记录（commit / 重编结果） -->
+**Cross-session naming conflicts:** Looks fine individually, but when combined, it blows up. Initially, book.h declared allBooks, book.cpp defined Booklist, and library_d.cpp used allBooks - three sessions gave different names each. Seen separately, they are all reasonable, but when combined, it results in undefined reference. After modification, it was unified to Booklist (book.h:31 / book.cpp:12), and the problem disappeared. Lesson: It is again emphasized that the output content proposed by AI must undergo review, and the functions called in different files must maintain consistent naming.
 
-**What I would do differently:** compile the header standalone before writing `book.cpp`, and test on
-the Linux build earlier instead of only in CLion.
+**Final compilation issue:** I attempted to compile the Makefile in CLion, but kept receiving errors. The problem of CLion's compilation errors has not been resolved even after multiple attempts of asking the AI for help. Finally, the team members reviewed each other's codes together and found that the errors in the codes prevented them from compiling, which was resolved by correcting the codes and then they could run normally. Lesson: When the AI repeatedly makes unreasonable suggestions, one should change the approach.
+
 
 ---
 
