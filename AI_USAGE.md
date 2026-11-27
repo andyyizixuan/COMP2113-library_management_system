@@ -24,12 +24,11 @@ numbers below refer to those PDFs.
 
 ### A.2 Prompt history
 
-https://chat.deepseek.com/share/eqpd0h9xvhh7f0sxan
 
 1. *(p.1)* “我是A工作的，我需要做什么，具体点告诉我，有需要的信息问我”
    → module boundary and interface list (`addBook`, `findBookById`, `findBookByIdMutable`,
    `searchBooksByTitle`, `handleAddBook`, `handleSearchBook`), `Book` fields `id / title / author /
-   total_number / available_number`. Adopted; the suggested ISBN and category fields were dropped.
+   total_number / available_number`. Adopted; the suggested ISBN and category fields were dropped. But the functions findBookById, findBookByIdMutable, and searchBooksByTitle have been deprecated. Instead, searchBook_ID and searchBook_title are used ultimately.
 
 2. *(p.72)* “所以uniqueptr到底有啥优势，我一个vector书柜有啥书就写在booklist，加书就add去掉就delete…”
    → explained copy/dangling/double-free problems with `vector<Book>`. Kept
@@ -56,11 +55,11 @@ https://chat.deepseek.com/share/eqpd0h9xvhh7f0sxan
 - `book.h` committed first on a branch and merged through PR #1 (pp.112–113), so B–E could code
   against it before `book.cpp` existed.
 - `book.cpp` written against the final header, compiled with
-  `g++ -pedantic-errors -std=c++11 -Wall -Wextra`.
+  `g++ -pedantic-errors -std=c++11 -Wall`.
 - Global container renamed `allBooks` → `Booklist` (p.115) after aligning names with B–E.
 - During integration, fixed the full-width punctuation in `main.cpp` (E's file) and reported it to E;
   link errors were traced to files missing from the build.
-- Transcript: `ai_logs/A_book_module.pdf`, 198 pages.
+- Transcript: `Liu Xuanyu_AI_Prompt.pdf`, 198 pages.
 
 ### A.4 Critical reflection
 
